@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.meirco.babyobservations.utils.StringUtils;
 
@@ -56,7 +57,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static String getCreate() {
         return SQL_CREATE_ENTRIES_TABLE + "\n" +
-                SQL_CREATE_SEEN_ENTRIES_TABLE+ "\n" +
+                SQL_CREATE_SEEN_ENTRIES_TABLE + "\n" +
                 SQL_CREATE_SESSIONS_TABLE + "\n";
     }
 
@@ -199,6 +200,28 @@ public class DbHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
+    }
+
+    public Cursor getTopUsed() {
+        Cursor cursor = null;
+        try {
+            String table = Contract.SeenEntry.TABLE;
+            String[] columns = new String[]{Contract.SeenEntry._ID, Contract.SeenEntry.COL_TEXT};
+            String selection = null;
+            String[] selectionArgs = null;
+            String groupBy = null;
+            String having = null;
+            String orderBy = Contract.SeenEntry.COL_FREQ + " DESC";
+            cursor = getReadableDatabase()
+                    .query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return cursor;
+    }
+
+    public static String getSeenText(Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndex(Contract.SeenEntry.COL_TEXT));
     }
 
 

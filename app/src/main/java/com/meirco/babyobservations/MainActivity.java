@@ -1,11 +1,18 @@
 package com.meirco.babyobservations;
 
 import android.app.Activity;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.meirco.babyobservations.db.DbHelper;
@@ -19,6 +26,8 @@ public class MainActivity extends Activity {
     private Button mSaveButton;
     private long mSessionId;
     private TextView mDebugTextView;
+    private ListView mMostUsedEntriesListView;
+    private CursorAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +41,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 saveEntry();
+                updateTopUsedList();
             }
         });
         mDebugTextView = (TextView) findViewById(R.id.debug_text);
@@ -44,7 +54,13 @@ public class MainActivity extends Activity {
                 toggleSessionState();
             }
         });
+        mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
+        mAdapter = new Adapter(this,DbHelper.getInstance(this).getTopUsed());
+        mMostUsedEntriesListView.setAdapter(mAdapter);
+    }
 
+    private void updateTopUsedList() {
+        mAdapter.changeCursor(DbHelper.getInstance(this).getTopUsed());
     }
 
     private void saveEntry() {
@@ -79,4 +95,26 @@ public class MainActivity extends Activity {
         }
     }
 
+    private static class Adapter extends CursorAdapter {
+
+        public Adapter(Context context, Cursor c) {
+            super(context, c, true);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            TextView tv = (TextView) LayoutInflater.from(context).inflate(R.layout.list_item, null);
+            edit(tv, cursor);
+            return tv;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            edit((TextView) view, cursor);
+        }
+
+        private void edit(TextView tv, Cursor cursor) {
+            tv.setText(DbHelper.getSeenText(cursor));
+        }
+    }
 }
