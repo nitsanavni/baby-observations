@@ -150,6 +150,24 @@ public class DbHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void addEntry(long textId, long sessionId) {
+        ContentValues values = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            upFrequency(db, textId);
+            values.put(Contract.Entry.COL_CREATED, System.currentTimeMillis());
+            values.put(Contract.Entry.COL_SESSION, sessionId);
+            values.put(Contract.Entry.COL_TEXT, textId);
+            db.insert(Contract.Entry.TABLE, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     public void addEntry(String string, long sessionId) {
         if (StringUtils.isNullOrEmpty(string)) {
             return;
@@ -159,23 +177,32 @@ public class DbHelper extends SQLiteOpenHelper {
         db.beginTransaction();
         try {
             long textId = getTextId(db, string);
+            upFrequency(db, textId);
             values.put(Contract.Entry.COL_CREATED, System.currentTimeMillis());
             values.put(Contract.Entry.COL_SESSION, sessionId);
             values.put(Contract.Entry.COL_TEXT, textId);
             db.insert(Contract.Entry.TABLE, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         } finally {
             db.endTransaction();
         }
     }
 
+    private void upFrequency(SQLiteDatabase db, long textId) {
+        String table = Contract.SeenEntry.TABLE;
+        String freq = Contract.SeenEntry.COL_FREQ;
+        String id = Contract.SeenEntry._ID;
+        db.execSQL("UPDATE " + table + " SET " + freq + " = " + freq + " + 1 WHERE " + id + " = " + String.valueOf(textId));
+    }
+
     private long getTextId(SQLiteDatabase db, String text) {
-        String[] columns = new String[]{Contract.SeenEntry._ID, Contract.SeenEntry.COL_TEXT};
-        String selection = Contract.SeenEntry.COL_TEXT + " =?";
-        String[] selectionArgs = new String[]{text};
         Cursor cursor = null;
         try {
+            String[] columns = new String[]{Contract.SeenEntry._ID, Contract.SeenEntry.COL_TEXT};
+            String selection = Contract.SeenEntry.COL_TEXT + " =?";
+            String[] selectionArgs = new String[]{text};
             cursor = db.query(Contract.SeenEntry.TABLE,
                     columns,
                     selection,
@@ -190,10 +217,11 @@ public class DbHelper extends SQLiteOpenHelper {
             long time = System.currentTimeMillis();
             values.put(Contract.SeenEntry.COL_CREATED, time);
             values.put(Contract.SeenEntry.COL_UPDATE, time);
-            values.put(Contract.SeenEntry.COL_FREQ, 1);
+            values.put(Contract.SeenEntry.COL_FREQ, 0);
             values.put(Contract.SeenEntry.COL_TEXT, text);
             return db.insert(Contract.SeenEntry.TABLE, null, values);
         } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
             return 0L;
         } finally {
             if (cursor != null) {

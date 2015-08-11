@@ -8,7 +8,10 @@
         android:id="@+id/debug_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/session_button" />
+        android:layout_above="@+id/session_button"
+        android:maxLines="10"
+        android:scrollbars="vertical"
+        android:overScrollMode="always"/>
 
     <Button
         android:id="@+id/session_button"

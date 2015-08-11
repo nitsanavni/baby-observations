@@ -5,9 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
         });
         mDebugTextView = (TextView) findViewById(R.id.debug_text);
         mDebugTextView.setText(DbHelper.getCreate());
+        mDebugTextView.setMovementMethod(ScrollingMovementMethod.getInstance());
         mSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,6 +60,13 @@ public class MainActivity extends Activity {
         mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
         mAdapter = new Adapter(this,DbHelper.getInstance(this).getTopUsed());
         mMostUsedEntriesListView.setAdapter(mAdapter);
+        mMostUsedEntriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DbHelper.getInstance(MainActivity.this).addEntry(id, mSessionId);
+                updateTopUsedList();
+            }
+        });
     }
 
     private void updateTopUsedList() {
