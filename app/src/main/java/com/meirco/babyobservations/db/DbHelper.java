@@ -230,13 +230,17 @@ public class DbHelper extends SQLiteOpenHelper {
         }
     }
 
-    public Cursor getTopUsed() {
+    public Cursor getTopUsed(String filter) {
         Cursor cursor = null;
         try {
             String table = Contract.SeenEntry.TABLE;
             String[] columns = new String[]{Contract.SeenEntry._ID, Contract.SeenEntry.COL_TEXT};
             String selection = null;
             String[] selectionArgs = null;
+            if (!StringUtils.isNullOrEmpty(filter)) {
+                selection = Contract.SeenEntry.COL_TEXT + " LIKE ?";
+                selectionArgs = new String[]{"%" + filter + "%"};
+            }
             String groupBy = null;
             String having = null;
             String orderBy = Contract.SeenEntry.COL_FREQ + " DESC";

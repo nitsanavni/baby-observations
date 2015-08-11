@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,22 @@ public class MainActivity extends Activity {
         mSessionButton = (Button) findViewById(R.id.session_button);
         mSessionLayout = findViewById(R.id.session_layout);
         mField = (EditText) findViewById(R.id.text_field);
+        mField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateTopUsedList();
+            }
+        });
         mSaveButton = (Button) findViewById(R.id.save_entry_button);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +75,7 @@ public class MainActivity extends Activity {
             }
         });
         mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
-        mAdapter = new Adapter(this,DbHelper.getInstance(this).getTopUsed());
+        mAdapter = new Adapter(this,DbHelper.getInstance(this).getTopUsed(null));
         mMostUsedEntriesListView.setAdapter(mAdapter);
         mMostUsedEntriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -70,7 +87,12 @@ public class MainActivity extends Activity {
     }
 
     private void updateTopUsedList() {
-        mAdapter.changeCursor(DbHelper.getInstance(this).getTopUsed());
+        Editable text = mField.getText();
+        String filter = null;
+        if (null != text)  {
+            filter = text.toString();
+        }
+        mAdapter.changeCursor(DbHelper.getInstance(this).getTopUsed(filter));
     }
 
     private void saveEntry() {
