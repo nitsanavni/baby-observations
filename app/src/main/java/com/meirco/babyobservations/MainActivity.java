@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.meirco.babyobservations.db.DbHelper;
+import com.meirco.babyobservations.utils.StringUtils;
 
 public class MainActivity extends Activity {
 
@@ -103,6 +104,7 @@ public class MainActivity extends Activity {
         String string = text.toString();
         DbHelper dbHelper = DbHelper.getInstance(this);
         dbHelper.addEntry(string, mSessionId);
+        mField.setText(StringUtils.EMPTY_STRING);
     }
 
     private void toggleSessionState() {
