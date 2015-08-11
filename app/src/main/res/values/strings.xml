@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Baby Observations</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="end_session">end session</string>
+    <string name="save_entry_button_text">save</string>
+    <string name="entry_text_field_hint">Type in an entry</string>
+    <string name="begin_session">Begin a new session</string>
+</resources>
