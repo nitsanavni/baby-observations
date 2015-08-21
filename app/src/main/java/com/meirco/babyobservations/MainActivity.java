@@ -83,8 +83,8 @@ public class MainActivity extends Activity {
         mSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String s = mDbHelper.get().toString();
-                mDebugTextView.setText(s);
+//                String s = mDbHelper.get().toString();
+//                mDebugTextView.setText(s);
                 toggleSessionState();
             }
         });
