@@ -10,15 +10,17 @@ import android.util.Log;
 
 import com.meirco.babyobservations.utils.StringUtils;
 
+import javax.inject.Singleton;
+
 /**
  * Created by nitsa_000 on 10-Aug-15.
  */
+@Singleton
 public class DbHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "baby_obs.db";
     private static final int DB_VERSION = 1;
     private static final String TAG = "dbhelper";
 
-    private static DbHelper sInstance;
 
     private static final String INT_TYPE = " INTEGER";
     private static final String TEXT_TYPE = " TEXT";
@@ -122,13 +124,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
-    }
-
-    public static DbHelper getInstance(Context context) {
-        if (null == sInstance) {
-            sInstance = new DbHelper(context);
-        }
-        return sInstance;
     }
 
     public DbHelper(Context context) {

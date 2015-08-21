@@ -3,6 +3,7 @@ package com.meirco.babyobservations;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,14 +15,21 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.meirco.babyobservations.db.DbHelper;
+import com.meirco.babyobservations.di.Injector;
 import com.meirco.babyobservations.utils.StringUtils;
 
+import javax.inject.Inject;
+
+import dagger.Lazy;
+
 public class MainActivity extends Activity {
+
+    @Inject
+    Lazy<DbHelper> mDbHelper;
 
     private Button mSessionButton;
     private boolean mIsSessionActive = false;
@@ -36,6 +44,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Injector.getInstance().getAppComponent().inject(this);
         setContentView(R.layout.activity_main);
         mSessionButton = (Button) findViewById(R.id.session_button);
         mSessionLayout = findViewById(R.id.session_layout);
@@ -65,23 +74,22 @@ public class MainActivity extends Activity {
             }
         });
         mDebugTextView = (TextView) findViewById(R.id.debug_text);
-        mDebugTextView.setText(DbHelper.getCreate());
         mDebugTextView.setMovementMethod(ScrollingMovementMethod.getInstance());
         mSessionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String s = DbHelper.getInstance(MainActivity.this).toString();
+                String s = mDbHelper.get().toString();
                 mDebugTextView.setText(s);
                 toggleSessionState();
             }
         });
         mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
-        mAdapter = new Adapter(this,DbHelper.getInstance(this).getTopUsed(null));
+        mAdapter = new Adapter(this,mDbHelper.get().getTopUsed(null));
         mMostUsedEntriesListView.setAdapter(mAdapter);
         mMostUsedEntriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                DbHelper.getInstance(MainActivity.this).addEntry(id, mSessionId);
+                mDbHelper.get().addEntry(id, mSessionId);
                 updateTopUsedList();
             }
         });
@@ -93,7 +101,7 @@ public class MainActivity extends Activity {
         if (null != text)  {
             filter = text.toString();
         }
-        mAdapter.changeCursor(DbHelper.getInstance(this).getTopUsed(filter));
+        mAdapter.changeCursor(mDbHelper.get().getTopUsed(filter));
     }
 
     private void saveEntry() {
@@ -102,8 +110,7 @@ public class MainActivity extends Activity {
             return;
         }
         String string = text.toString();
-        DbHelper dbHelper = DbHelper.getInstance(this);
-        dbHelper.addEntry(string, mSessionId);
+        mDbHelper.get().addEntry(string, mSessionId);
         mField.setText(StringUtils.EMPTY_STRING);
     }
 
