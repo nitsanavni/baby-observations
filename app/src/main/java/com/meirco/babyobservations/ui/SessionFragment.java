@@ -25,23 +25,23 @@ import dagger.Lazy;
 /**
  * Created by nitsa_000 on 21-Aug-15.
  */
-public class SessionsFragment extends Fragment {
+public class SessionFragment extends Fragment {
 
     @Inject
     Lazy<DbHelper> mDbHelper;
 
-    public static SessionsFragment newInstance() {
-        return new SessionsFragment();
+    public static SessionFragment newInstance() {
+        return new SessionFragment();
     }
 
-    public SessionsFragment() {
+    public SessionFragment() {
         Injector.getInstance().getAppComponent().inject(this);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ListView list = (ListView) inflater.inflate(R.layout.fragment_sessions, null);
+        ListView list = (ListView) inflater.inflate(R.layout.fragment_session, null);
         list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessions()));
         return list;
     }

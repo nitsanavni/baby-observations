@@ -3,4 +3,9 @@
     <item
         android:id="@+id/sessions"
         android:title="@string/sessions" />
+
+    <item
+        android:id="@+id/support"
+        android:title="@string/support" />
+
 </menu>

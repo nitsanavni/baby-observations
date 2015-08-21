@@ -2,7 +2,9 @@ package com.meirco.babyobservations;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -10,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,10 +100,24 @@ public class MainActivity extends Activity {
         });
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation);
-        mNavigationView.getMenu().findItem(R.id.sessions).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        Menu menu = mNavigationView.getMenu();
+        menu.findItem(R.id.sessions).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 showSessionsScreen();
+                closeDrawer();
+                return true;
+            }
+        });
+        menu.findItem(R.id.support).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                String uriText = "mailto:" + getString(R.string.support_email) +
+                        "?subject=" + Uri.encode(getString(R.string.support_email_subject));
+                Uri uri = Uri.parse(uriText);
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(uri);
+                startActivity(Intent.createChooser(intent, getString(R.string.support_email_chooser_title)));
                 closeDrawer();
                 return true;
             }
