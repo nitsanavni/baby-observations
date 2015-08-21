@@ -335,6 +335,31 @@ public class DbHelper extends SQLiteOpenHelper {
         return cursor.getLong(cursor.getColumnIndex(Contract.Session.COL_CREATED));
     }
 
+    public Cursor getSessionEntries(long sessionId) {
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String table = Contract.Entry.TABLE;
+            String[] columns = null;
+            String selection = Contract.Entry.COL_SESSION + "=?";
+            String[] selectionArgs = new String[]{String.valueOf(sessionId)};
+            String groupBy = null;
+            String having = null;
+            String orderBy = Contract.Session.COL_CREATED + " ASC";
+            return db.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+        } catch (Exception e) {
+            Log.e(TAG, "" + e.getMessage());
+        }
+        return null;
+    }
+
+    public static long getEntryCreated(Cursor cursor) {
+        return cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_CREATED));
+    }
+
+    public static long getEntryText(Cursor cursor) {
+        return cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_TEXT));
+    }
+
     private static final class Contract {
         public Contract() {
         }

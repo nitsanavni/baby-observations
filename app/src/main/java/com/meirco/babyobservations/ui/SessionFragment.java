@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,11 +28,29 @@ import dagger.Lazy;
  */
 public class SessionFragment extends Fragment {
 
+    private static final String KEY_SESSION_ID = "session_id";
+    private static final String TAG = "SessionF";
     @Inject
     Lazy<DbHelper> mDbHelper;
+    private long mSessionId;
 
-    public static SessionFragment newInstance() {
-        return new SessionFragment();
+    public static Fragment newInstance(long sessionId) {
+        Fragment f = new SessionFragment();
+        Bundle args = new Bundle(1);
+        args.putLong(KEY_SESSION_ID, sessionId);
+        f.setArguments(args);
+        return f;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (null == args || args.isEmpty()) {
+            Log.e(TAG, "something went wrong - got null/empty args");
+            return;
+        }
+        mSessionId = args.getLong(KEY_SESSION_ID);
     }
 
     public SessionFragment() {
@@ -41,9 +60,12 @@ public class SessionFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ListView list = (ListView) inflater.inflate(R.layout.fragment_session, null);
-        list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessions()));
-        return list;
+        View content = inflater.inflate(R.layout.fragment_session, null);
+        ListView list = (ListView) content.findViewById(R.id.list);
+        list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessionEntries(mSessionId)));
+        TextView title = (TextView) content.findViewById(R.id.title);
+        title.setText(getString(R.string.session_title, mSessionId));
+        return content;
     }
 
     private static class Adapter extends CursorAdapter {
@@ -67,10 +89,11 @@ public class SessionFragment extends Fragment {
         }
 
         private void edit(TextView tv, Cursor cursor) {
-            long created = DbHelper.getSessionCreated(cursor);
+            long created = DbHelper.getEntryCreated(cursor);
             mCalendar.setTimeInMillis(created);
-            tv.setText(String.valueOf(DbHelper.getSessionId(cursor)) + " " +
-                    String.valueOf(mCalendar.getTime().toString()));
+            String time = String.valueOf(mCalendar.getTime().toString());
+            String textId = String.valueOf(DbHelper.getEntryText(cursor));
+            tv.setText(time + " " + textId);
         }
     }
 

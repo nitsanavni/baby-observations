@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,7 +44,21 @@ public class SessionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ListView list = (ListView) inflater.inflate(R.layout.fragment_sessions, null);
         list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessions()));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                openSessionScreen(id);
+            }
+        });
         return list;
+    }
+
+    private void openSessionScreen(long id) {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_frame_for_fragments, SessionFragment.newInstance(id))
+                .addToBackStack(null)
+                .commit();
     }
 
     private static class Adapter extends CursorAdapter {

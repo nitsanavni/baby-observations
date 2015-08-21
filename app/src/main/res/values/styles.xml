@@ -10,5 +10,15 @@
         <item name="android:textColor">@color/light_blue</item>
     </style>
 
+    <style name="title" parent="android:Widget.TextView">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/purple</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">22dp</item>
+        <item name="android:padding">@dimen/medium_padding</item>
+    </style>
+
     <color name="light_blue">#FF6060FF</color>
+    <color name="purple">#700070</color>
+    <dimen name="medium_padding">5dp</dimen>
 </resources>

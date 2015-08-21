@@ -13,4 +13,6 @@
     <string name="support_email">nitsanav@gmail.com</string>
     <string name="support_email_subject">support for Baby Observations app</string>
     <string name="support_email_chooser_title">email support</string>
+    <string name="session_title">session number %1$s</string>
+    <string name="session_entries_title">session log:</string>
 </resources>
