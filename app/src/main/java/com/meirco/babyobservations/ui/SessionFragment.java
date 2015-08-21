@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.method.CharacterPickerDialog;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +20,12 @@ import android.widget.Toast;
 import com.meirco.babyobservations.R;
 import com.meirco.babyobservations.db.DbHelper;
 import com.meirco.babyobservations.di.Injector;
+import com.meirco.babyobservations.utils.StringUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashSet;
 
 import javax.inject.Inject;
 
@@ -38,6 +41,7 @@ public class SessionFragment extends Fragment {
     @Inject
     Lazy<DbHelper> mDbHelper;
     private long mSessionId;
+    private SparseArray<String> mSeenMap = new SparseArray<>();
 
     public static Fragment newInstance(long sessionId) {
         Fragment f = new SessionFragment();
@@ -67,7 +71,7 @@ public class SessionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View content = inflater.inflate(R.layout.fragment_session, null);
         ListView list = (ListView) content.findViewById(R.id.list);
-        list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessionEntries(mSessionId)));
+        list.setAdapter(new Adapter(getActivity(), mDbHelper.get().getSessionEntries(mSessionId), this));
         TextView title = (TextView) content.findViewById(R.id.title);
         title.setText(getString(R.string.session_title, mSessionId));
         content.findViewById(R.id.export_button).setOnClickListener(new View.OnClickListener() {
@@ -93,7 +97,8 @@ public class SessionFragment extends Fragment {
             calendar.setTimeInMillis(entryCreated);
             dateFormat.setCalendar(calendar);
             String format = dateFormat.format(calendar.getTime());
-            String entryText = mDbHelper.get().getSeenText(DbHelper.getEntryText(cursor));
+            long seenId = DbHelper.getEntryText(cursor);
+            String entryText = getSeenText(seenId);
             sb.append(format)
                     .append("\t")
                     .append(entryText)
@@ -106,12 +111,25 @@ public class SessionFragment extends Fragment {
         startActivity(intent);
     }
 
+    private String getSeenText(long seenId) {
+        String seenText = mSeenMap.get((int) seenId, StringUtils.EMPTY_STRING);
+        if (StringUtils.isNullOrEmpty(seenText)) {
+            seenText = mDbHelper.get().getSeenText(seenId);
+            mSeenMap.put((int) seenId, seenText);
+        }
+        return seenText;
+    }
+
     private static class Adapter extends CursorAdapter {
         private final Calendar mCalendar;
+        private final SessionFragment mFragment;
+        private final DateFormat mDateFormat;
 
-        public Adapter(Context context, Cursor c) {
+        public Adapter(Context context, Cursor c, SessionFragment fragment) {
             super(context, c, true);
             mCalendar = Calendar.getInstance();
+            mFragment = fragment;
+            mDateFormat = SimpleDateFormat.getTimeInstance();
         }
 
         @Override
@@ -129,8 +147,9 @@ public class SessionFragment extends Fragment {
         private void edit(TextView tv, Cursor cursor) {
             long created = DbHelper.getEntryCreated(cursor);
             mCalendar.setTimeInMillis(created);
-            String time = String.valueOf(mCalendar.getTime().toString());
-            String textId = String.valueOf(DbHelper.getEntryText(cursor));
+            String time = mDateFormat.format(mCalendar.getTime());
+            long seenId = DbHelper.getEntryText(cursor);
+            String textId = mFragment.getSeenText(seenId);
             tv.setText(time + " " + textId);
         }
     }
