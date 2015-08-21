@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.meirco.babyobservations.db.DbHelper;
 import com.meirco.babyobservations.di.Injector;
+import com.meirco.babyobservations.ui.SessionsFragment;
 import com.meirco.babyobservations.utils.StringUtils;
 
 import javax.inject.Inject;
@@ -99,11 +100,20 @@ public class MainActivity extends Activity {
         mNavigationView.getMenu().findItem(R.id.sessions).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                showSessionsScreen();
                 closeDrawer();
                 return true;
             }
         });
         updateSessionUI();
+    }
+
+    private void showSessionsScreen() {
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content_frame_for_fragments, SessionsFragment.newInstance())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void updateTopUsedList() {

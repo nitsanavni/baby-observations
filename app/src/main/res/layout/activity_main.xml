@@ -54,6 +54,11 @@
 
         </RelativeLayout>
 
+        <FrameLayout
+            android:id="@+id/content_frame_for_fragments"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView
