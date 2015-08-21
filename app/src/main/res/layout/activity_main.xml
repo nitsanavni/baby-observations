@@ -1,50 +1,65 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <TextView
-        android:id="@+id/debug_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/session_button"
-        android:overScrollMode="always"
-        android:scrollbars="vertical" />
-
-    <Button
-        android:id="@+id/session_button"
-        style="@style/Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
-        android:id="@+id/session_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/session_button">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
 
-        <EditText
-            android:id="@+id/text_field"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/entry_text_field_hint" />
+        <TextView
+            android:id="@+id/debug_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/session_button"
+            android:overScrollMode="always"
+            android:scrollbars="vertical" />
 
         <Button
-            android:id="@+id/save_entry_button"
+            android:id="@+id/session_button"
             style="@style/Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/text_field"
-            android:text="@string/save_entry_button_text" />
+            android:layout_centerInParent="true" />
 
-        <ListView
-            android:id="@+id/most_fequently_used_list"
+        <RelativeLayout
+            android:id="@+id/session_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/text_field" />
+            android:layout_below="@id/session_button">
+
+            <EditText
+                android:id="@+id/text_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="@string/entry_text_field_hint" />
+
+            <Button
+                android:id="@+id/save_entry_button"
+                style="@style/Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/text_field"
+                android:text="@string/save_entry_button_text" />
+
+            <ListView
+                android:id="@+id/most_fequently_used_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_field" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
-</RelativeLayout>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation_items" />
+</android.support.v4.widget.DrawerLayout>

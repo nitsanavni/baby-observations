@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,6 +40,8 @@ public class MainActivity extends Activity {
     private long mSessionId;
     private TextView mDebugTextView;
     private CursorAdapter mAdapter;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +94,15 @@ public class MainActivity extends Activity {
                 updateTopUsedList();
             }
         });
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation);
+        mNavigationView.getMenu().findItem(R.id.sessions).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                closeDrawer();
+                return true;
+            }
+        });
         updateSessionUI();
     }
 
@@ -99,6 +113,23 @@ public class MainActivity extends Activity {
             filter = text.toString();
         }
         mAdapter.changeCursor(mDbHelper.get().getTopUsed(filter));
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isDrawerOpen()) {
+            closeDrawer();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    private void closeDrawer() {
+        mDrawerLayout.closeDrawer(mNavigationView);
+    }
+
+    private boolean isDrawerOpen() {
+        return mDrawerLayout.isDrawerOpen(mNavigationView);
     }
 
     private void saveEntry() {
