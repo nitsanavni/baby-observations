@@ -15,4 +15,5 @@
     <string name="support_email_chooser_title">email support</string>
     <string name="session_title">session number %1$s</string>
     <string name="session_entries_title">session log:</string>
+    <string name="entry_saved_feedback_msg">entry saved: \"%1$s\"</string>
 </resources>

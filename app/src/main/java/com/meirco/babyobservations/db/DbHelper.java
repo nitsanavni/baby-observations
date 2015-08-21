@@ -290,6 +290,9 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     public static String getSeenText(Cursor cursor) {
+        if (null == cursor) {
+            return null;
+        }
         return cursor.getString(cursor.getColumnIndex(Contract.SeenEntry.COL_TEXT));
     }
 
@@ -358,6 +361,27 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static long getEntryText(Cursor cursor) {
         return cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_TEXT));
+    }
+
+    public String getSeenText(long id) {
+        Cursor cursor = null;
+        try {
+            String table = Contract.SeenEntry.TABLE;
+            String[] columns = new String[]{Contract.SeenEntry.COL_TEXT};
+            String selection = Contract.SeenEntry._ID + "=?";
+            String[] selectionArgs = new String[]{String.valueOf(id)};
+            String groupBy = null;
+            String having = null;
+            String orderBy = null;
+            cursor = getReadableDatabase()
+                    .query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "" + e.getMessage());
+        }
+        return getSeenText(cursor);
     }
 
     private static final class Contract {

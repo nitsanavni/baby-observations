@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
@@ -22,6 +23,7 @@ import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.meirco.babyobservations.db.DbHelper;
 import com.meirco.babyobservations.di.Injector;
@@ -95,6 +97,7 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mDbHelper.get().addEntry(id, mSessionId);
+                showFeedbackOnEntrySave(id);
                 updateTopUsedList();
             }
         });
@@ -123,6 +126,14 @@ public class MainActivity extends Activity {
             }
         });
         updateSessionUI();
+    }
+
+    private void showFeedbackOnEntrySave(long id) {
+        String entry = mDbHelper.get().getSeenText(id);
+        if (StringUtils.isNullOrEmpty(entry)) {
+            return;
+        }
+        showFeedbackOnEntrySave(entry);
     }
 
     private void showSessionsScreen() {
@@ -166,7 +177,22 @@ public class MainActivity extends Activity {
         }
         String string = text.toString();
         mDbHelper.get().addEntry(string, mSessionId);
+        showFeedbackOnEntrySave(string);
         mField.setText(StringUtils.EMPTY_STRING);
+    }
+
+    private void showFeedbackOnEntrySave(String entryString) {
+        final Toast toast = Toast.makeText(this,
+                getString(R.string.entry_saved_feedback_msg, entryString),
+                Toast.LENGTH_SHORT);
+        toast.show();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toast.cancel();
+            }
+        }, 600);
     }
 
     private void toggleSessionState() {
