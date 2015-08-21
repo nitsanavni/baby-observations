@@ -29,6 +29,7 @@ import com.meirco.babyobservations.db.DbHelper;
 import com.meirco.babyobservations.di.Injector;
 import com.meirco.babyobservations.ui.SessionsFragment;
 import com.meirco.babyobservations.utils.StringUtils;
+import com.meirco.babyobservations.utils.ToastUtils;
 
 import javax.inject.Inject;
 
@@ -182,17 +183,8 @@ public class MainActivity extends Activity {
     }
 
     private void showFeedbackOnEntrySave(String entryString) {
-        final Toast toast = Toast.makeText(this,
-                getString(R.string.entry_saved_feedback_msg, entryString),
-                Toast.LENGTH_SHORT);
-        toast.show();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                toast.cancel();
-            }
-        }, 600);
+        String text = getString(R.string.entry_saved_feedback_msg, entryString);
+        ToastUtils.shorterToast(this, text, 600);
     }
 
     private void toggleSessionState() {
