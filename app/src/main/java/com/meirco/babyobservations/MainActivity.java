@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
             }
         });
         mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
-        mAdapter = new Adapter(this,mDbHelper.get().getTopUsed(null));
+        mAdapter = new Adapter(this, mDbHelper.get().getTopUsed(null));
         mMostUsedEntriesListView.setAdapter(mAdapter);
         mMostUsedEntriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -93,12 +93,13 @@ public class MainActivity extends Activity {
                 updateTopUsedList();
             }
         });
+        updateSessionUI();
     }
 
     private void updateTopUsedList() {
         Editable text = mField.getText();
         String filter = null;
-        if (null != text)  {
+        if (null != text) {
             filter = text.toString();
         }
         mAdapter.changeCursor(mDbHelper.get().getTopUsed(filter));
@@ -116,14 +117,21 @@ public class MainActivity extends Activity {
 
     private void toggleSessionState() {
         mIsSessionActive = !mIsSessionActive;
-        saveSession();
+        if (mIsSessionActive) {
+            startNewSession();
+        } else {
+            saveSession();
+        }
         updateSessionUI();
     }
 
-    private void saveSession() {
-        if (mIsSessionActive) {
+    private void startNewSession() {
+        mSessionId = mDbHelper.get().addSession();
+    }
 
-        }
+    private void saveSession() {
+        // TODO - add a dialog for editing the free text of the session
+        mDbHelper.get().closeSession(mSessionId);
     }
 
     private void updateSessionUI() {

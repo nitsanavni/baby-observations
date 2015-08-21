@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.meirco.babyobservations.utils.StringUtils;
 
+import java.util.Calendar;
+
 import javax.inject.Singleton;
 
 /**
@@ -56,16 +58,49 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String SQL_DELETE_SESSIONS_TABLE =
             "DROP TABLE IF EXISTS " + Contract.Session.TABLE;
 
-
-    public static String getCreate() {
-        return SQL_CREATE_ENTRIES_TABLE + "\n" +
-                SQL_CREATE_SEEN_ENTRIES_TABLE + "\n" +
-                SQL_CREATE_SESSIONS_TABLE + "\n";
-    }
-
     public String toString() {
-        return printEntries() + "\n" + printSeenEntries();
+        return printSessions() +
+                "\n" + printEntries() +
+                "\n" + printSeenEntries();
     }
+
+    private String printSessions() {
+        Cursor cursor = null;
+        try {
+            cursor = getReadableDatabase()
+                    .query(Contract.Session.TABLE,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null);
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("session:");
+            while (!cursor.isAfterLast()) {
+                long created = cursor.getLong(cursor.getColumnIndex(Contract.Session.COL_CREATED));
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(created);
+                sb
+                        .append("\n")
+                        .append(cursor.getLong(cursor.getColumnIndex(Contract.Session._ID)))
+                        .append(" ")
+                        .append(calendar.getTime().toString());
+                cursor.moveToNext();
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 
     private String printSeenEntries() {
         Cursor cursor = null;
@@ -83,8 +118,11 @@ public class DbHelper extends SQLiteOpenHelper {
             }
             StringBuilder sb = new StringBuilder();
             while (!cursor.isAfterLast()) {
-                sb.append("\nseen: " + cursor.getLong(cursor.getColumnIndex(Contract.SeenEntry._ID)) + " " +
-                        cursor.getString(cursor.getColumnIndex(Contract.SeenEntry.COL_TEXT)));
+                sb
+                        .append("\nseen: ")
+                        .append(cursor.getLong(cursor.getColumnIndex(Contract.SeenEntry._ID)))
+                        .append(" ")
+                        .append(cursor.getString(cursor.getColumnIndex(Contract.SeenEntry.COL_TEXT)));
                 cursor.moveToNext();
             }
             return sb.toString();
@@ -112,8 +150,12 @@ public class DbHelper extends SQLiteOpenHelper {
                 return null;
             }
             StringBuilder sb = new StringBuilder();
+            sb.append("entries:");
             while (!cursor.isAfterLast()) {
-                sb.append("\nentry: " + cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_TEXT)));
+                sb.append("\n")
+                        .append(cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_SESSION)))
+                        .append(" ")
+                        .append(cursor.getLong(cursor.getColumnIndex(Contract.Entry.COL_TEXT)));
                 cursor.moveToNext();
             }
             return sb.toString();
@@ -249,6 +291,23 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public static String getSeenText(Cursor cursor) {
         return cursor.getString(cursor.getColumnIndex(Contract.SeenEntry.COL_TEXT));
+    }
+
+    public long addSession() {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Contract.Session.COL_CREATED, System.currentTimeMillis());
+        long id = db.insert(Contract.Session.TABLE, null, values);
+        return id;
+    }
+
+    public void closeSession(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Contract.Session.COL_ENDED, System.currentTimeMillis());
+        String whereClause = Contract.Session._ID + "=?";
+        String[] whereArgs = new String[]{String.valueOf(id)};
+        db.update(Contract.Session.TABLE, values, whereClause, whereArgs);
     }
 
 
