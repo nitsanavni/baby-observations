@@ -3,7 +3,6 @@ package com.meirco.babyobservations;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -35,10 +34,8 @@ public class MainActivity extends Activity {
     private boolean mIsSessionActive = false;
     private View mSessionLayout;
     private EditText mField;
-    private Button mSaveButton;
     private long mSessionId;
     private TextView mDebugTextView;
-    private ListView mMostUsedEntriesListView;
     private CursorAdapter mAdapter;
 
     @Override
@@ -65,8 +62,7 @@ public class MainActivity extends Activity {
                 updateTopUsedList();
             }
         });
-        mSaveButton = (Button) findViewById(R.id.save_entry_button);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.save_entry_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveEntry();
@@ -83,10 +79,10 @@ public class MainActivity extends Activity {
                 toggleSessionState();
             }
         });
-        mMostUsedEntriesListView = (ListView) findViewById(R.id.most_fequently_used_list);
         mAdapter = new Adapter(this, mDbHelper.get().getTopUsed(null));
-        mMostUsedEntriesListView.setAdapter(mAdapter);
-        mMostUsedEntriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView list = (ListView) findViewById(R.id.most_fequently_used_list);
+        list.setAdapter(mAdapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mDbHelper.get().addEntry(id, mSessionId);
