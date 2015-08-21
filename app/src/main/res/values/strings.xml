@@ -16,4 +16,6 @@
     <string name="session_title">session number %1$s</string>
     <string name="session_entries_title">session log:</string>
     <string name="entry_saved_feedback_msg">entry saved: \"%1$s\"</string>
+    <string name="export_session_button">export this session</string>
+    <string name="export_session_no_entries_msg">no entries to export</string>
 </resources>
